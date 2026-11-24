@@ -145,8 +145,10 @@ class SettingsScreen(a: MainActivity) : Screen(a) {
         screen.addView(Ui.text(c, tr("Mise en veille"), 18f, Ui.TEXT))
         screen.addView(dropdown(delays, a.prefs.standbyMinutes.toString()) { m -> a.prefs.standbyMinutes = m.toInt() },
             Ui.lp(Ui.MATCH, Ui.u(58), t = 8))
-        screen.addView(Ui.text(c, tr("Sans geste ni programme en cours, l'écran s'assombrit et n'affiche plus que l'heure. Touchez-le ou tournez le bouton pour reprendre ; le couvercle et la balance le réveillent aussi."),
+        screen.addView(Ui.text(c, tr("Sans geste ni programme en cours, l'écran s'assombrit. Touchez-le ou tournez le bouton pour reprendre ; le couvercle et la balance le réveillent aussi."),
             15f, Ui.TEXT3).apply { setLineSpacing(0f, 1.1f) }, Ui.lp(t = 8))
+        screen.addView(toggle(tr("Afficher l'heure en veille"), a.prefs.standbyShowClock) { a.prefs.standbyShowClock = it },
+            Ui.lp(t = 10))
         val knob = listOf("normal" to tr("Normale"), "dim" to tr("Plus légère"), "off" to tr("Éteinte"))
         screen.addView(Ui.text(c, tr("Molette pendant la veille"), 18f, Ui.TEXT), Ui.lp(t = 12))
         screen.addView(dropdown(knob, a.prefs.standbyKnob) { a.prefs.standbyKnob = it },

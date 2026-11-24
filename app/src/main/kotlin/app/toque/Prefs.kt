@@ -128,6 +128,17 @@ class Prefs(context: Context) {
             p.edit().putString("standbyKnob", v).commit()
         }
 
+    /**
+     * Afficher l'heure (et « Touchez pour reprendre ») pendant la veille. Activé par défaut
+     * (comportement Toque d'origine) ; désactivable pour éteindre le panneau (backlight sysfs).
+     * L'alerte bol chaud rallume l'écran le temps qu'elle soit visible.
+     */
+    var standbyShowClock: Boolean
+        get() = p.getBoolean("standbyShowClock", true)
+        set(v) {
+            p.edit().putBoolean("standbyShowClock", v).commit()
+        }
+
     /** Fuseau horaire : « auto » (d'après la connexion Internet) ou un identifiant IANA choisi à la main. */
     var timeZone: String
         get() = p.getString("timeZone", "auto") ?: "auto"

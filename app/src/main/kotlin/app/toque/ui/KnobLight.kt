@@ -16,13 +16,28 @@ import java.util.concurrent.Executors
  */
 object KnobLight {
     private const val LEDS = "/sys/class/leds"
-    private const val SAVED = "/data/local/tmp/toque-knob-light.saved"
+    const val SAVED = "/data/local/tmp/toque-knob-light.saved"
     const val NIGHT_LEVEL = 3
+
+    val restoreShell: String
+        get() = """
+            L=$LEDS
+            if [ -f $SAVED ]; then
+              read R G W < $SAVED
+              echo ${'$'}R > ${'$'}L/red/brightness; echo ${'$'}G > ${'$'}L/green/brightness; echo ${'$'}W > ${'$'}L/blue/brightness
+              rm -f $SAVED
+            fi
+        """.trimIndent()
 
     private val worker = Executors.newSingleThreadExecutor { r -> Thread(r, "toque-molette").apply { isDaemon = true } }
     @Volatile private var dimmed = false
 
-    /** [level] : intensité du blanc pendant la veille ([NIGHT_LEVEL] en veilleuse, 0 pour éteindre). */
+    val isDimmed: Boolean get() = dimmed
+
+    fun markRestored() {
+        dimmed = false
+    }
+
     fun start(level: Int) {
         if (dimmed) return
         dimmed = true
@@ -42,18 +57,7 @@ object KnobLight {
         if (!dimmed) return
         dimmed = false
         worker.execute {
-            RootShell.run(
-                """
-                L=$LEDS
-                if [ -f $SAVED ]; then
-                  read R G W < $SAVED
-                  echo ${'$'}R > ${'$'}L/red/brightness; echo ${'$'}G > ${'$'}L/green/brightness; echo ${'$'}W > ${'$'}L/blue/brightness
-                  rm -f $SAVED
-                fi
-                true
-                """.trimIndent(),
-                8_000,
-            )
+            RootShell.run(restoreShell + "\ntrue", 8_000)
         }
     }
 }
